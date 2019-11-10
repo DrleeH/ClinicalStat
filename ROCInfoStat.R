@@ -12,6 +12,10 @@
 ## 结果解读
 # subgroup的结果是 case vs control
 
+if(!require(tidyverse)) install.packages("tidyverse")
+if(!require(pROC)) install.packages("pROC")
+library(tidyverse)
+library(pROC)
 ROCStatFunc <- function(dat, group, var,retype = c("threshold", "specificity", "sensitivity"),
                         auc = T,youden = T, digit = 3){
     subgroup <- levels(as.factor(dat[[group]]))
