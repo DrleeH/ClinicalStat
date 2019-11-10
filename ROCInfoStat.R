@@ -10,7 +10,7 @@
 # youden: 是否返回约登指数，逻辑值，默认为TURE。
 # digit: 结果保留几位小数点
 ## 结果解读
-# subgroup的结果是 case vs control
+# VarGroup的结果是 control vs case
 
 if(!require(tidyverse)) install.packages("tidyverse")
 if(!require(pROC)) install.packages("pROC")
@@ -18,35 +18,56 @@ library(tidyverse)
 library(pROC)
 ROCStatFunc <- function(dat, group, var,retype = c("threshold", "specificity", "sensitivity"),
                         auc = T,youden = T, digit = 3){
-    subgroup <- levels(as.factor(dat[[group]]))
-    subgroup1 <- paste0(subgroup[2], " vs ", subgroup[1])
+    VarGroup <- levels(as.factor(dat[[group]]))
+    VarGroup1 <- paste0(VarGroup[1], " vs ", VarGroup[2])
     rocmodel <- roc(dat[[group]], dat[[var]])
-    other <- coords(rocmodel, "b", ret = retype)
+    other <- coords(rocmodel, "b", ret = retype, transpose = FALSE)
     other <- round(other, digit)
     if(auc == T){
         auc <- round(ci.auc(rocmodel),digit)
         auc <- paste0(auc[2],"(",auc[1],"-",auc[3],")")
         if(youden == T){
-            abc <- coords(rocmodel, "b", ret = c("specificity", "sensitivity"))
+            abc <- coords(rocmodel, "b", ret = c("specificity", "sensitivity"), transpose = FALSE)
             youdenres <- abc[1] + abc[2] - 1
             youdenres <- round(youdenres, digit)
-            result <- c(group, subgroup1, auc, other, youdenres)
-            names(result) <- c("group", "subgroup","auc(95%CI)", retype, "youden")
+            result <- cbind(group, VarGroup1, auc, other, youdenres)
+            names(result) <- c("group", "VarGroup","auc(95%CI)", retype, "youden")
         }else{
-            result <- c(group, subgroup1, auc, other)
-            names(result) <- c("group", "subgroup", "auc(95%CI)", retype)
+            result <- cbind(group, VarGroup1, auc, other)
+            names(result) <- c("group", "VarGroup", "auc(95%CI)", retype)
         }
     }else{
         if(youden == T){
-            abc <- coords(rocmodel, "b", ret = c("specificity", "sensitivity"))
+            abc <- coords(rocmodel, "b", ret = c("specificity", "sensitivity"), transpose = FALSE)
             youdenres <- abc[1] + abc[2] - 1
             youdenres <- round(youdenres, digit)
-            result <- c(group, subgroup1, other, youdenres)
-            names(result) <- c("group","subgroup", retype, "youden")
+            result <- cbind(group, VarGroup1, other, youdenres)
+            names(result) <- c("group","VarGroup", retype, "youden")
         }else{
-            result <- c(group, subgroup1,other)
-            names(result) <- c("group", "subgroup",retype)
+            result <- cbind(group, VarGroup1,other)
+            names(result) <- c("group", "VarGroup",retype)
         }
     }
     return(result)
+}
+
+ROCSubStatFunc <- function(dat, group, subgroup = NULL,var,retype = c("threshold", "specificity", "sensitivity"),
+                           auc = T,youden = T, digit = 3){
+    if(is.null(subgroup)){
+        ROCStatFunc(dat = dat, group = group, var = var, retype = retype, 
+                    auc = auc, youden = youden, digit = digit)
+    }else{
+    SubUniq <- unique(dat[[subgroup]])
+    resultROC <- sapply(SubUniq, function(x){
+        SubGroupName <- paste0(subgroup, ": ", x)
+        dat1 <- dat[dat[[subgroup]] == x,]
+        result <- ROCStatFunc(dat = dat1, group = group, var = var, retype = retype, 
+                                 auc = auc, youden = youden, digit = digit)
+        result$subgroup <- SubGroupName
+        return(result)
+    })
+    result1 <- t(resultROC)
+    result1 <- result1[,c(ncol(result1), 1:(ncol(result1)-1))]
+    return(result1)
+    }
 }
