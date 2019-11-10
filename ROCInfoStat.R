@@ -25,16 +25,17 @@ ROCStatFunc <- function(dat, group, var,retype = c("threshold", "specificity", "
     other <- round(other, digit)
     if(auc == T){
         auc <- round(ci.auc(rocmodel),digit)
-        auc <- paste0(auc[2],"(",auc[1],"-",auc[3],")")
+        aucReal <- auc[2]
+        auc.ci <- paste0(auc[1], "-", auc[3])
         if(youden == T){
             abc <- coords(rocmodel, "b", ret = c("specificity", "sensitivity"), transpose = FALSE)
             youdenres <- abc[1] + abc[2] - 1
             youdenres <- round(youdenres, digit)
-            result <- cbind(group, VarGroup1, auc, other, youdenres)
-            names(result) <- c("group", "VarGroup","auc(95%CI)", retype, "youden")
+            result <- cbind(group, VarGroup1, aucReal, auc.ci, other, youdenres)
+            names(result) <- c("group", "VarGroup","auc", "auc.ci",retype, "youden")
         }else{
-            result <- cbind(group, VarGroup1, auc, other)
-            names(result) <- c("group", "VarGroup", "auc(95%CI)", retype)
+            result <- cbind(group, VarGroup1, aucReal, auc.ci, other)
+            names(result) <- c("group", "VarGroup", "auc", "auc.ci", retype)
         }
     }else{
         if(youden == T){
