@@ -2,6 +2,8 @@
 ### 通过Normal参数来控制此否符合正态分布
 ### 如果符合正态分布进行两组进行T检验，三组进行方差分析
 ### 符合不符合正态分布分布，则进行非参
+if(!require(tidyverse)) install.packages("tidyverse")
+library(tidyverse)
 TableOneStat <- function(dat, group, var, Normal = TRUE){
     datexpr <- dat[c(var, group)]
     datexpr <- na.omit(datexpr)
