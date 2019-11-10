@@ -57,17 +57,23 @@ ROCSubStatFunc <- function(dat, group, subgroup = NULL,var,retype = c("threshold
         ROCStatFunc(dat = dat, group = group, var = var, retype = retype, 
                     auc = auc, youden = youden, digit = digit)
     }else{
-    SubUniq <- unique(dat[[subgroup]])
-    resultROC <- sapply(SubUniq, function(x){
-        SubGroupName <- paste0(subgroup, ": ", x)
-        dat1 <- dat[dat[[subgroup]] == x,]
-        result <- ROCStatFunc(dat = dat1, group = group, var = var, retype = retype, 
+        ROCAll <- ROCStatFunc(dat = dat, group = group, var = var, retype = retype, 
+                              auc = auc, youden = youden, digit = digit)
+        ROCAll$subgroup <- subgroup
+        ROCAll1 <- ROCAll[,c(ncol(ROCAll), 1:(ncol(ROCAll)-1))]
+        SubUniq <- unique(dat[[subgroup]])
+        resultROC <- sapply(SubUniq, function(x){
+            SubGroupName <- paste0(subgroup, ": ", x)
+            dat1 <- dat[dat[[subgroup]] == x,]
+            result <- ROCStatFunc(dat = dat1, group = group, var = var, retype = retype, 
                                  auc = auc, youden = youden, digit = digit)
-        result$subgroup <- SubGroupName
-        return(result)
-    })
-    result1 <- t(resultROC)
-    result1 <- result1[,c(ncol(result1), 1:(ncol(result1)-1))]
-    return(result1)
+            result$subgroup <- SubGroupName
+            return(result)
+        })
+        result1 <- t(resultROC)
+        result1 <- result1[,c(ncol(result1), 1:(ncol(result1)-1))]
+        result2 <- rbind(ROCAll1, result1)
+        return(result2)
     }
 }
+
