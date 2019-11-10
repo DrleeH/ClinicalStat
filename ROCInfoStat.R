@@ -71,9 +71,10 @@ ROCSubStatFunc <- function(dat, group, subgroup = NULL,var,retype = c("threshold
             return(result)
         })
         result1 <- t(resultROC)
-        result1 <- result1[,c(ncol(result1), 1:(ncol(result1)-1))]
+        result1 <- result1[,c(ncol(result1), 1:(ncol(result1)-1))] 
         result2 <- rbind(ROCAll1, result1)
-        return(result2)
+        result3 <- sapply(result2, unlist) # V4 修复了数据框里面是列表的bug
+        return(result3)
     }
 }
 
