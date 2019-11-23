@@ -7,7 +7,7 @@ library(tidyverse)
 TableOneStat <- function(dat, group, var, Normal = TRUE){
     datexpr <- dat[c(var, group)]
     datexpr <- na.omit(datexpr)
-    datexpr$num <- as.numeric(as.factor(datexpr[[group]]))
+    datexpr$num <- as.factor(datexpr[[group]])
     len <- length(unique(datexpr[[group]])) 
     if(Normal == T){
         result <- datexpr %>% group_by(!!sym(group)) %>% 
@@ -17,7 +17,8 @@ TableOneStat <- function(dat, group, var, Normal = TRUE){
                    category = group) %>% 
             select(category,level = group, n, summarise)
         if(len == 2){
-            p.val <- t.test(datexpr[[var]], datexpr[["num"]])$p.val
+            formu <- as.formula(paste0(var, "~", "num"))
+            p.val <- t.test(formu, data = datexpr)$p.val
             result$p.val <- c(p.val, "")
             result$p <- c(ifelse(p.val < 0.001, "< 0.001", round(p.val,3)), "")
         }else if(len >= 3){
@@ -37,7 +38,8 @@ TableOneStat <- function(dat, group, var, Normal = TRUE){
                    category = group) %>% 
             select(category,level = group, n, summarise)
         if(len == 2){
-            p.val <- wilcox.test(datexpr[[var]], datexpr[["num"]])$p.val
+            formu <- as.formula(paste0(var, "~", "num"))
+            p.val <- wilcox.test(formu, data = datexpr)$p.val
             result$p.val <- c(p.val, "")
             result$p <- c(ifelse(p.val < 0.001, "< 0.001", p.val), "")
         }else if(len >= 3){
