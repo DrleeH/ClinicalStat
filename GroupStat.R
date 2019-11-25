@@ -14,8 +14,8 @@ TableOneStat <- function(dat, group, var, Normal = TRUE){
             summarise(n = n(), mean = mean(!!sym(var), na.rm = T),
                       sd = sd(!!sym(var), na.rm = T)) %>% 
             mutate(summarise = paste0(round(mean,3), "±", round(sd,3)),
-                   category = group) %>% 
-            select(category,level = group, n, summarise)
+                   group = group) %>% 
+            select(group, n, summarise)
         if(len == 2){
             formu <- as.formula(paste0(var, "~", "num"))
             p.val <- t.test(formu, data = datexpr)$p.val
@@ -26,6 +26,7 @@ TableOneStat <- function(dat, group, var, Normal = TRUE){
             fit <- aov(formu, data = datexpr)
             p.val <- summary(fit)[[1]]$'Pr(>F)'[1] 
             result$p.val <- c(p.val, rep("",len -1))
+            result
             result$p <- c(ifelse(p.val < 0.001, "< 0.001", round(p.val,3)), rep("",len -1))
         }
     }else{
@@ -35,8 +36,8 @@ TableOneStat <- function(dat, group, var, Normal = TRUE){
                       `75%` = quantile(!!sym(var), .75,na.rm = T)) %>% 
             mutate(summarise = paste0(round(median, 3), "(", round(`25%`, 3), "-",
                                       round(`75%`, 3), ")"), 
-                   category = group) %>% 
-            select(category,level = group, n, summarise)
+                   group = group) %>% 
+            select(group, n, summarise)
         if(len == 2){
             formu <- as.formula(paste0(var, "~", "num"))
             p.val <- wilcox.test(formu, data = datexpr)$p.val
@@ -50,5 +51,8 @@ TableOneStat <- function(dat, group, var, Normal = TRUE){
             result$p <- c(ifelse(p.val < 0.001, "< 0.001", round(p.val,3)), rep("",len -1))
         }
     }
+    result$var <- var
+    ColNum <- ncol(result)
+    result <- result[,c(ColNum, 1:(ColNum - 1))]
     return(result)
 }
