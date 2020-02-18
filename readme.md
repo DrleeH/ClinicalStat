@@ -1,99 +1,126 @@
-# 函数参数介绍
+> This is a series functions to do the basic clinical analysis. All of the functions were writted by R. 
 
-## GroupStat: 用来分析一个变量在不同分组之间的差异
+# TableOneStat
 
-### 输入：
+compared the differences between two groups or more groups. When the group is **two**, `t-test` is used to analyze the data. When the group is **more than two**, `ANOVA `is used. When the distribution is **normal**, the test is above. Otherwise, `wilcox` test and `kruskal` test is used for two or more group respectively.
 
-```R
-TableOneStat(dat, group, var, Normal = TRUE)
-```
+## Import 
 
-我们需要输入四个参数
+>TableOneStat(dat, group, var, Normal = TRUE)
 
-- dat : 需要分析的数据集
-- group : 想要分析的分组
-- var： 想要分析的连续性变量
-- Normal: 是否服从正态分布
+Four parameters need to import.
 
-### 输出：
+- dat: the datasets we need to analysis
+- group: group varable, it can be string type 
+- var: the continuous variable
+- Normal: whether the data is nomral distribution. 
 
-- 如果服从**正态分布**，**两个变量**的我们使用`t检验`来进行分析。如果是**2个以上变量**的使用`方差分析`。同时返回`mean±sd`
-- 如果**不服从正态分布**：**两个变量**的我们使用`wilcox检验`来进行分析，如果是**2个以上变量**的使用`kruskal检验`进行统计分析。同时返回`median(25%var-75%var)`
+## Export
 
-![image-20191110190433607](/Users/lihao/Library/Application Support/typora-user-images/image-20191110190433607.png)
+The result contains six columns.
 
-## ROCInfoStat: 获得ROC分析当中的结果信息
+- Category: the group name
+- level: Specific groups within the group
+- n: sample number
+- summarise: When the distribution is normal, `mean±sd` is exported. otherwise,  `median(25%var-75%var)` is exported.
+- p.val: Specific p-value
+- p: if the p.val is less than 0.001, it return `< 0.001`, else the return the specific p value with three decimal places.
 
-脚本里面包括两个函数。其实只有`ROCSubStatFunc`即可。之前那个已经整合到这个里面。但是因为`ROCSubStatFunc`也是基于前一个修改的。所以不能删除。
+![image-20191110190433607](https://tva1.sinaimg.cn/large/0082zybply1gc0dbba0yej30am03r0su.jpg)
 
-### 输入
+# ROCInfoStat:
 
-```R
-ROCSubStatFunc(dat, group, subgroup = NULL,var,retype = c("threshold", "specificity", "sensitivity"),
-                           auc = T,youden = T, digit = 3)
-```
+get the ROC analysis result. this function can also get the subgroup ROC result
 
-- `dat`： 需要输入的数据框
-- `group`： 结果变量的列名
-- `subgroup`：亚组内的ROC曲线信息分析。这里如果我们想做亚组的话，就填。如果不做的话。就把`"age"`这个改成`NULL`。
-- `retype` : 需要提取的信息。可以包括“threshold”, “specificity”, “sensitivity”, “accuracy”, “tn” (true negative count), “tp” (true positive count), “fn” (false negative count), “fp” (false positive count), “npv” (negative predictive value), “ppv” (positive predictive value), “precision”, “recall”. “1-specificity”, “1-sensitivity”, “1-accuracy”, “1-npv” and “1-ppv” 这么多。默认是是前三种。如果需要别的可以往后加就行。
-- `auc`: 是否获得最佳曲线下面积。如果不想用就把`T`改成`F`
-- `youden`： 是否获得约登指数。如果不想用就把`T`改成`F`
+## Import 
 
-### 输出
+> ROCSubStatFunc(dat, group, subgroup = NULL,var,retype = c("threshold", "specificity", "sensitivity"),
+>                            auc = T,youden = T, digit = 3)
 
-![image-20191110190917299](/Users/lihao/Library/Application Support/typora-user-images/image-20191110190917299.png)
+- dat: the datasets we need to analysis
+- group: outcome varable, it can be string type 
+- subgroup: another subgroup varable.
+- var: the continuous variable
+- retype: which variables need to be returned. the default is **threshold**, **specificity**, and **sensitivity**. we can also add  **tn (true negative count)**, **tp(true positive count)**, **fn(false negative count)**, **fp(false positive count)**, **npv(negative predictive value)**, **ppv(positive predictive value)**, **precision**, **recall**. **1-specificity**, **1-sensitivity**, **1-accuracy**, **1-npv** and **1-ppv**
+- auc: whether the auc is return. `True` is default
+- youden: whether the youden number is return. `True` is default
+- digit: how many decimal places to keep. 3 is default.
 
-- `subgroup`: 亚组的分组。其中第一列是在整体下面的ROC曲线
-- `group`： 结局变量的名字。
-- `VarGroup`： 变量的分组。前面的是对照组，后面的病例组。例如：“GA vs GC+GS”代表，GA是对照组，GC+GS是病例组
-- 剩下的都是函数指定后出现的结果
+## Export
 
-## ROCplot: 绘制ROC曲线
+the result contains at least 9 columns(depends on retype).
 
-脚本包括三个函数
+![image-20191110190917299](https://tva1.sinaimg.cn/large/0082zybply1gc0dt3sve5j30hz07j3zp.jpg)
 
-### SubGroupRocPlot：绘制单独的ROC曲线
+- subgroup: when we add subgroup, the specific subgroup.
+- group: outcome group name.
+- VarGroup: specific outcome group. if the result is `GA vs GC`. the first group is control group. the second group is case group.
+- The rest is the ROC result information.
 
-可以定义基于某一个亚组来绘制各个亚组的ROC曲线。
+# ROCplot
 
-```R
-SubGroupRocPlot(dat, subgroup = NULL, var, group, smooth = T, col = "firebrick1")
-```
+this R script contains three functions. 
 
-- `dat`： 输入的数据集
-- `subgroup`：基于某一个亚组进行绘图。如果是`NULL`则不绘制整体的图
-- `var`： 用来做ROC的变量
-- `group`： 用来绘制ROC的结局变量。必须是**二分类**的
-- `smooth`： 曲线是否平滑
-- `col`： ROC曲线的颜色
+## SubGroupRocPlot
 
-### SubGroupRocAllPlot：把某一变量的所有亚组的ROC曲线绘制到一个图上。
+Plot basic ROC plot based on all data or one subgroup data
 
-```R
-SubGroupRocAllPlot(dat, subgroup, var, group, smooth = F, ALL = FALSE, mycol = mycol)
-```
+### Import
 
-- `dat`： 输入的数据集
-- `subgroup`：基于某一个亚组进行绘图。如果是`NULL`则不绘制整体的图
-- `var`： 用来做ROC的变量
-- `group`： 用来绘制ROC的结局变量。必须是**二分类**的
+> SubGroupRocPlot(dat, subgroup = NULL, var, group, smooth = T, col = "firebrick1")
+>
+> 
 
-- `smooth`： 曲线是否平滑
-- `ALL`: 是否绘制一个所有数据的ROC曲线
+- dat: the datasets we need to analysis
+- group: outcome varable, it can be string type 
+- subgroup: another subgroup varable. `NULL` is default.
+- var: the continuous variable
 
-- `mycol`： ROC曲线的颜色设定
+- smooth: whether the ROC curve is smooth.
+- col: ROC curve color.
 
-### MultiVarROCAllPlot: 在一个图上绘制不同结局或者不同变量的ROC
+### Export
 
-```R
-MultiVarROCAllPlot(dat, var, group, smooth = F, mycol = mycol)
-```
+Every ROC curve based on subgroup was plotted. and the pdf file will created in working directory.
 
-- `dat`： 输入的数据集
-- `subgroup`：基于某一个亚组进行绘图。如果是`NULL`则不绘制整体的图
-- `var`： 用来做ROC的变量。 var可以是多个通过`c`来链接
-- `group`： 用来绘制ROC的结局变量。必须是**二分类**的。group可以是多个。通过`c`来链接
-- `mycol`： ROC曲线的颜色设定
+![image-20200218114010809](https://tva1.sinaimg.cn/large/0082zybply1gc0ejyssm1j30mk0nbmyf.jpg)
 
-PS：var和group变量只能有一个是多个。如果两个都是多个的话。则不能绘图
+## SubGroupRocAllPlot
+
+`SubGroupRocPlot` create a pdf file for each ROC curve based on each subgroup. `SubGroupRocAllPlot` plot all subgroup in one pdf. 
+
+### Import
+
+> SubGroupRocAllPlot(dat, subgroup, var, group, smooth = F, ALL = FALSE, mycol = mycol)
+
+- dat: the datasets we need to analysis
+- group: outcome varable, it can be string type 
+- subgroup: another subgroup varable. `NULL` is default.
+- var: the continuous variable
+- ALL: whether plot a ROC curve based on all data.
+
+- smooth: whether the ROC curve is smooth.
+- mycol: ROC curve color. Default is `slateblue, seagreen3, dodgerblue, firebrick1, lightgoldenrod, magenta, orange2` seven colors. 
+
+### Export
+
+the pdf file will saved in working directory automatically. 
+
+![image-20200218114912745](https://tva1.sinaimg.cn/large/0082zybply1gc0etd8hlkj30n40nbwh5.jpg)
+
+## MultiVarROCAllPlot
+
+Plot ROC curve with different var or differnet outcome in one pdf 
+
+### Import
+
+>MultiVarROCAllPlot(dat, var, group, smooth = F, mycol = mycol)
+
+- dat: the datasets we need to analysis
+- group: outcome varable, it can be string type. The group can contains multi columns.
+- subgroup: another subgroup varable. `NULL` is default.
+- var: the continuous variable. The var can contains multi columns.
+- mycol: ROC curve color. Default is `slateblue, seagreen3, dodgerblue, firebrick1, lightgoldenrod, magenta, orange2` seven colors. 
+
+PS: `Var` and `group` can only have one has multiple group. tow var can  not be be multiple group at the same time. 
+

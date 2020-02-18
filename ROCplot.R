@@ -47,7 +47,9 @@ SubGroupRocPlot <- function(dat, subgroup = NULL, var, group, smooth = T,
     }
     }
 }
-### 绘制同一变量不同亚组所有ROC曲线绘制到一张图上，
+### 绘制同一变量不同亚组所有ROC曲线绘制到一张图上
+mycol <- c("slateblue", "seagreen3", "dodgerblue", "firebrick1", "lightgoldenrod", 
+           "magenta", "orange2")
 SubGroupRocAllPlot <- function(dat, subgroup, var, group, smooth = F, ALL = FALSE,
                                mycol = mycol){
     subgroupVar <- unique(dat[[subgroup]])
