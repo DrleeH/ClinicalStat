@@ -38,7 +38,7 @@ get the ROC analysis result. this function can also get the subgroup ROC result
 >                            auc = T,youden = T, digit = 3)
 
 - dat: the datasets we need to analysis
-- group: outcome varable, it can be string type 
+- group: outcome varable, it can be character type 
 - subgroup: another subgroup varable.
 - var: the continuous variable
 - retype: which variables need to be returned. the default is **threshold**, **specificity**, and **sensitivity**. we can also add  **tn (true negative count)**, **tp(true positive count)**, **fn(false negative count)**, **fp(false positive count)**, **npv(negative predictive value)**, **ppv(positive predictive value)**, **precision**, **recall**. **1-specificity**, **1-sensitivity**, **1-accuracy**, **1-npv** and **1-ppv**
@@ -54,7 +54,7 @@ the result contains at least 9 columns(depends on retype).
 
 - subgroup: when we add subgroup, the specific subgroup.
 - group: outcome group name.
-- VarGroup: specific outcome group. if the result is `GA vs GC`. the first group is control group. the second group is case group.
+- VarGroup: specific outcome group. if the result is `GA vs GC`. the `GA` is control group. `GC` is case group.
 - The rest is the ROC result information.
 
 # ROCplot
@@ -72,7 +72,7 @@ Plot basic ROC plot based on all data or one subgroup data
 > 
 
 - dat: the datasets we need to analysis
-- group: outcome varable, it can be string type 
+- group: outcome varable, it can be character type 
 - subgroup: another subgroup varable. `NULL` is default.
 - var: the continuous variable
 
@@ -94,7 +94,7 @@ Every ROC curve based on subgroup was plotted. and the pdf file will created in 
 > SubGroupRocAllPlot(dat, subgroup, var, group, smooth = F, ALL = FALSE, mycol = mycol)
 
 - dat: the datasets we need to analysis
-- group: outcome varable, it can be string type 
+- group: outcome varable, it can be character type 
 - subgroup: another subgroup varable. `NULL` is default.
 - var: the continuous variable
 - ALL: whether plot a ROC curve based on all data.
@@ -124,3 +124,59 @@ Plot ROC curve with different var or differnet outcome in one pdf
 
 PS: `Var` and `group` can only have one has multiple group. tow var can  not be be multiple group at the same time. 
 
+# logitAnalysis
+
+When we perform `logistics regression`. We often do the univaritate regression, then do the multivaritate regression. This script contains two functions, **logitUniVar** and **logitMultiVar**, which can do the univaritate regression and multivaritate regression respectively.
+
+## logitUniVar
+
+Perform the univaritate regression. return the OR value and p value .
+
+### Import
+
+> logitUniVar((dat, group, var, digit = 3, Categorical = F)
+
+- dat: the datasets we need to analysis
+- group:  outcome varable, it can be string type.
+- var: Variables waiting to be analyzed
+- Categorical: is the var categorical variable. `F` is default. Some variable is Category but the data format is number. When we perform logit analysis When the data format is numeric, The analysis will perform as continuous category. 
+- digit: how many decimal places to keep. 3 is default.
+
+### Export
+
+Seven column can be returned
+
+![image-20200219124927027](https://tva1.sinaimg.cn/large/0082zybply1gc1m6cs2x2j30op03rq3u.jpg)
+
+- var: Variable name. if the variable is category variable, it will return `variable name + specific subgroup`. 
+- group: outcome varable
+- subgroup: specific outcome group. if the result is `GA vs GC`. the `GA` is control group. `GC` is case group.
+- OR, 95%CI, p.val : logistics result in the analysis.
+- p: if the p.val < 0.001, the p will return `< 0.001`. `p` is the result version of `p.val`
+
+## logitMultiVar
+
+Perform the multivaritate regression. return the OR value and p value .
+
+### Import
+
+> logitMultiVar((dat, group, var, adjvar,digit = 3, Categorical = F)
+
+- dat: the datasets we need to analysis
+- group:  outcome varable, it can be string type.
+- var: Variables waiting to be analyzed
+- adjvar: Variables waiting to be adjusted
+- Categorical: is the var categorical variable. `F` is default.
+- digit: how many decimal places to keep. 3 is default.
+
+**PS**: the `Categorical` paramater is only modify `var` parameter. if the `adjvar` contain categorical variables. Modify the variable before analysis.
+
+### Export
+
+![image-20200219125855072](https://tva1.sinaimg.cn/large/0082zybply1gc1mg7ban7j30pa03k0tp.jpg)
+
+- var: Variable name. if the variable is category variable, it will return `variable name + specific subgroup`. 
+- group: outcome varable
+- subgroup: specific outcome group. if the result is `GA vs GC`. the `GA` is control group. `GC` is case group.
+- OR, 95%CI, p.val : logistics result in the analysis.
+- p: if the p.val < 0.001, the p will return `< 0.001`. `p` is the result version of `p.val`
