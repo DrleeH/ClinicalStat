@@ -134,7 +134,7 @@ Perform the univaritate regression. return the OR value and p value .
 
 ### Import
 
-> logitUniVar((dat, group, var, digit = 3, Categorical = F)
+> logitUniVar(dat, group, var, digit = 3, Categorical = F)
 
 - dat: the datasets we need to analysis
 - group:  outcome varable, it can be string type.
@@ -160,7 +160,7 @@ Perform the multivaritate regression. return the OR value and p value .
 
 ### Import
 
-> logitMultiVar((dat, group, var, adjvar,digit = 3, Categorical = F)
+> logitMultiVar(dat, group, var, adjvar,digit = 3, Categorical = F)
 
 - dat: the datasets we need to analysis
 - group:  outcome varable, it can be string type.
@@ -180,3 +180,63 @@ Perform the multivaritate regression. return the OR value and p value .
 - subgroup: specific outcome group. if the result is `GA vs GC`. the `GA` is control group. `GC` is case group.
 - OR, 95%CI, p.val : logistics result in the analysis.
 - p: if the p.val < 0.001, the p will return `< 0.001`. `p` is the result version of `p.val`
+
+# CoxAnalysis
+
+When we perform `Cox regression`. We often do the univaritate regression, then do the multivaritate regression. This script contains two functions, **CoxUniVar** and **CoxMultiVar**, which can do the univaritate regression and multivaritate regression respectively.
+
+## CoxUniVar
+
+Perform the cox regression. return the OR value and p value .
+
+### Import
+
+> CoxUniVar(dat, status, times, var, digit = 3, Categorical = F)
+
+- dat: the datasets we need to analysis
+- status:  outcome varable, it can be string type.
+- times: time variable.
+- var: Variables waiting to be analyzed
+- Categorical: is the var categorical variable. `F` is default. Some variable is Category but the data format is number. When we perform logit analysis When the data format is numeric, The analysis will perform as continuous category. 
+- digit: how many decimal places to keep. 3 is default.
+
+### Export
+
+Seven column can be returned
+
+![image-20200219142449114](https://tva1.sinaimg.cn/large/0082zybply1gc1oxkvqngj30nx02xwf7.jpg)
+
+- var: Variable name. if the variable is category variable, it will return `variable name + specific subgroup`. 
+- group: outcome varable
+- subgroup: specific outcome group. if the result is `GA vs GC`. the `GA` is control group. `GC` is case group.
+- HR, 95%CI, p.val : cox result in the analysis.
+- p: if the p.val < 0.001, the p will return `< 0.001`. `p` is the result version of `p.val`
+
+## CoxMultiVar
+
+Perform the multivaritate regression. return the OR value and p value .
+
+### Import
+
+> CoxMultiVar(dat, status, times,var, adjvar,digit = 3, Categorical = F)
+
+- dat: the datasets we need to analysis
+- group:  outcome varable, it can be string type.
+- times: time variable.
+- var: Variables waiting to be analyzed
+- adjvar: Variables waiting to be adjusted
+- Categorical: is the var categorical variable. `F` is default.
+- digit: how many decimal places to keep. 3 is default.
+
+**PS**: the `Categorical` paramater is only modify `var` parameter. if the `adjvar` contain categorical variables. Modify the variable before analysis.
+
+### Export
+
+![image-20200219142813119](https://tva1.sinaimg.cn/large/0082zybply1gc1p149uxtj30pr03ndgs.jpg)
+
+- var: Variable name. if the variable is category variable, it will return `variable name + specific subgroup`. 
+- group: outcome varable
+- subgroup: specific outcome group. if the result is `GA vs GC`. the `GA` is control group. `GC` is case group.
+- HR, 95%CI, p.val : cox result in the analysis.
+- p: if the p.val < 0.001, the p will return `< 0.001`. `p` is the result version of `p.val`
+
