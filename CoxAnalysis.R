@@ -22,6 +22,8 @@ CoxUniVar <- function(dat, status, times, var, digit = 3, Categorical = F){
     result <- cbind(var1, status,subgroup1, HR, cito, p, p.val)
     colnames(result) <- c("var", "group", "subgroup","HR", "95%CI", "p.val", "p")
     result <- as.data.frame(result)
+    result$HR <- as.numeric(result$HR)
+    result$p.val <- as.numeric(result$p.val)
     return(result)
 }
 
@@ -59,5 +61,7 @@ CoxMultiVar <- function(dat, status, times,var, adjvar,digit = 3, Categorical = 
     result <- cbind(var1, status,subgroup1, HR, cito, p, p.val)
     colnames(result) <- c("var", "group", "subgroup","HR", "95%CI", "p.val", "p")
     result <- as.data.frame(result)
+    result$HR <- as.numeric(result$HR)
+    result$p.val <- as.numeric(result$p.val)
     return(result)
 }
