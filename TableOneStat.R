@@ -15,7 +15,7 @@ TableOneStat <- function(dat, group, var, Normal = TRUE){
                       sd = sd(!!sym(var), na.rm = T)) %>% 
             mutate(summarise = paste0(round(mean,3), "±", round(sd,3)),
                    group = group) %>% 
-            select(group, n, summarise)
+            select(!!sym(group), n, summarise)
         if(len == 2){
             formu <- as.formula(paste0(var, "~", "num"))
             p.val <- t.test(formu, data = datexpr)$p.val
@@ -37,7 +37,7 @@ TableOneStat <- function(dat, group, var, Normal = TRUE){
             mutate(summarise = paste0(round(median, 3), "(", round(`25%`, 3), "-",
                                       round(`75%`, 3), ")"), 
                    group = group) %>% 
-            select(group, n, summarise)
+            select(!!sym(group), n, summarise)
         if(len == 2){
             formu <- as.formula(paste0(var, "~", "num"))
             p.val <- wilcox.test(formu, data = datexpr)$p.val
